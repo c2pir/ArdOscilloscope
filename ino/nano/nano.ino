@@ -25,7 +25,8 @@ void init_pins_variables(){
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(9600);
+  Serial.begin(19200);
+  Serial.setTimeout(100);
   init_pins_variables();
 }
 
@@ -82,6 +83,8 @@ void loop() {
 
           if (pinType=="D"){
             valueD[pinId] = pinValue;
+            // WRITE
+            digitalWrite(pinD[pinId], valueD[pinId]);
             Serial.println("ACK:"+msg);
           }
           start = i+1;
@@ -100,13 +103,6 @@ void loop() {
   for (int i=0; i<nA; i++){
     if (modeA[i]==1){
       valueA[i] = analogRead(pinA[i]);
-    }
-  }
-
-  // WRITE LOOP
-  for (int i=0; i<nD; i++){
-    if (modeD[i]==2){
-      digitalWrite(pinD[i], valueD[i]);
     }
   }
 

@@ -42,7 +42,6 @@ class UIConf(QtWidgets.QWidget):
         
         
         self.flwPins.load(_json)
-        self.figure.connect_to_pins(self.flwPins)
 
         hl.addWidget(self.flwPins)
         hl.addWidget(self.figure)

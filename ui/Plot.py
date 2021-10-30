@@ -14,6 +14,8 @@ from matplotlib.backends.backend_qt5 import NavigationToolbar2QT as NavigationTo
 from matplotlib.figure import Figure
 import numpy as np
 
+from .Fields import PBSField
+
 
 class CustomNavigationToolbar( NavigationToolbar ):
     picked=QtCore.pyqtSignal(int,name='picked')
@@ -21,8 +23,8 @@ class CustomNavigationToolbar( NavigationToolbar ):
     def __init__(self, canvas, parent):
         NavigationToolbar.__init__(self,canvas,parent,True) # False to not show coordinates
 
-        self.pbOneShot = QtWidgets.QPushButton("One shot")
-        self.addWidget(self.pbOneShot)
+        self.pbsPlayPause = PBSField(["img/play.ico", "img/pause.png"])
+        self.addWidget(self.pbsPlayPause)
         
         self.clearButtons=[]
         
@@ -72,29 +74,13 @@ class SFigure(QtWidgets.QWidget):
         self.nbPoints = 500
                 
         # Create the navigation toolbar, tied to the canvas
-        self.mpl_toolbar = CustomNavigationToolbar(self.canvas, self) 
-        self.mpl_toolbar.pbOneShot.clicked.connect(self.draw)
+        self.mpl_toolbar = CustomNavigationToolbar(self.canvas, self)
         
         vbox = QtWidgets.QVBoxLayout()
         vbox.addWidget(self.mpl_toolbar)
         vbox.addWidget(self.canvas)
         self.setLayout(vbox)   
 
-    def connect_to_pins(self, pins):
-        self.pins = pins
-        self.datas = [[0 for i in range(self.nbPoints)] for i in range(len(self.pins.json))]
-        self.indexes = [0 for i in range(len(self.pins.json))]
-
-    def receiveData(self, data):
-        try:
-            for i in range(len(data)):
-                if i>=len(self.datas):
-                    break
-                self.datas[i][self.indexes[i]] = int(data[i])
-                self.indexes[i] = (self.indexes[i]+1)%self.nbPoints
-        except Exception as e:
-            print("ERROR:Plot:receiveData",e,data)
-        
     
     def onPress(self,event):
         pass
@@ -105,15 +91,15 @@ class SFigure(QtWidgets.QWidget):
     def onRelease(self,event):
         pass
     
-    def draw(self):
+    def draw(self, time, dataA, dataD):
         self.axeD.clear()
         self.axeA.clear()
-        for i in range(len(self.pins.json)):
-            conf = self.pins.json[i]
-            if conf["type"].startswith("D") and conf["watch"]==2:
-                self.axeD.plot(self.datas[i], label=conf["name"])
-            if conf["type"].startswith("A") and conf["watch"]==2:
-                self.axeA.plot(self.datas[i], label=conf["name"])
+        for key in dataD:
+            self.axeD.plot(dataD[key], label=key)
+        
+        for key in dataA:
+            self.axeA.plot(dataA[key], label=key)
+        
         self.axeD.legend()
         self.axeA.legend()
         self.axeA.grid()

@@ -5,6 +5,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from ui.UIConf import UIConf
 from core.com import ThreadSerial
+from core.recorder import Recorder
 import json
 
 
@@ -21,18 +22,19 @@ class Ui_Main(QtWidgets.QMainWindow):
         self.open_file_name = "conf/Arduino nano.json"
         self.result = None
         self.thSerial = ThreadSerial()
+        self.thRecorder = Recorder()
         f = open(self.open_file_name ,"r")
         txt = f.read()
         f.close()
         d = eval(txt)
         
-	## GUI
+        ## GUI
         self.resize(1353, 812)
         
         self.setWindowTitle("ArdOscil")
         
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("img/Brain-Icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("img/monitor.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.setWindowIcon(icon)
         self.centralwidget = UIConf(d)
         self.setCentralWidget(self.centralwidget)
@@ -80,7 +82,11 @@ class Ui_Main(QtWidgets.QMainWindow):
         self.centralwidget.fpbRefresh.clicked.connect(self.refresh)
         self.centralwidget.fpbConnect.clicked.connect(self.connect)
         self.centralwidget.fpbSend.clicked.connect(self.send)
-        self.thSerial.sData.connect(self.centralwidget.figure.receiveData)
+        self.centralwidget.figure.mpl_toolbar.pbsPlayPause.method = self.playPause
+        self.thSerial.sData.connect(self.thRecorder.receiveData)
+        
+        self.thRecorder.connect_to_pins(self.centralwidget.flwPins)
+        self.thRecorder.displayer = self.centralwidget.figure
         
         
     def connect(self):
@@ -88,6 +94,15 @@ class Ui_Main(QtWidgets.QMainWindow):
         print(ind)
         self.thSerial.connect(ind)
         self.thSerial.start()
+        self.thRecorder.start()
+
+    def playPause(self, play):
+        if play:
+            self.thRecorder.stop = False
+            self.thRecorder.start()
+        else:
+            self.thRecorder.stop = True
+        
 
     def refresh(self):
         self.thSerial.refresh()
@@ -98,7 +113,7 @@ class Ui_Main(QtWidgets.QMainWindow):
         self.thSerial.send(cmd)
 
     def changeMode(self, conf):
-        print(conf)
+        #print(conf)
         cmd = "par:{}:{}:{}".format(conf["type"][0],
                                     conf["id"],
                                     conf["mode"])
@@ -106,7 +121,6 @@ class Ui_Main(QtWidgets.QMainWindow):
 
     def changeWatch(self, conf):
         print(conf)
-        pass
     
     
     def save(self):
@@ -160,6 +174,7 @@ class Ui_Main(QtWidgets.QMainWindow):
 
     def closeEvent(self, event):
         self.thSerial.stop = True
+        self.thRecorder.stop = True
         self.thSerial.disconnect()
         event.accept()
     

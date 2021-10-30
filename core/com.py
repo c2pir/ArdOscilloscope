@@ -12,7 +12,7 @@ import serial.tools.list_ports
 
 class ThreadSerial(QtCore.QThread):
     """objet thread """
-    sData = QtCore.pyqtSignal(list)
+    sData = QtCore.pyqtSignal(dict)
     ConnexionError = QtCore.pyqtSignal(bool)
  
     def __init__(self, parent=None):
@@ -25,7 +25,8 @@ class ThreadSerial(QtCore.QThread):
             self.cmd = []
 
             
-            self.t0 = time.time()
+            self.t_TX = time.time()
+            self.t_RX = time.time()
             self.samplingFrequency = 1000 # Hz
             self.port_index = -1
 
@@ -41,7 +42,7 @@ class ThreadSerial(QtCore.QThread):
                 self.disconnect()
                 self.port_index = i
                 self.ser = serial.Serial(self.ports[i].device,timeout=2.0)
-                self.ser.baudrate = 9600 #250000
+                self.ser.baudrate = 19200 #250000
                 print("INFO:Serial: connected to "+str(self.ports[i].device))
         except:
             if (len(self.ports)!=0):
@@ -82,7 +83,8 @@ class ThreadSerial(QtCore.QThread):
                 try:
                     # TODO gestion python 2.0 (str) ou 3.0 (encode)
                     self.ser.write(self.cmd[0].encode())
-                    print(self.cmd[0])
+                    self.t_TX = time.time()
+                    print(self.t_TX, self.cmd[0])
                     if self.mutexCmd.tryLock(10):
                         del self.cmd[0]
                         self.mutexCmd.unlock()
@@ -97,15 +99,23 @@ class ThreadSerial(QtCore.QThread):
                 try:
                     # TODO gestion python 2.0 (str) ou 3.0 (decode("utf-8"))
                     self.msg = self.ser.readline().decode("utf-8")
+                    #self.ser.flushInput()
                     self.msg = self.msg.replace('\r\n','')
-                    self.do_received = True
-                    if self.msg.startswith("GET"):
-                        self.sData.emit(self.msg.split(":")[1:-1])
+                    if "GET" in self.msg: #.startswith("GET"):
+                        self.sData.emit({
+                                        "timestamp": time.time(),
+                                        "list": self.msg.split(":")[1:-1]
+                                        })
+                    if False: # perfo debug
+                        print("{} {} dt={}".format(time.time(), self.msg, time.time()-self.t_RX))
+                        self.t_RX = time.time()
+                    
                     if self.msg.startswith("ACK"):
-                        print(self.msg)
+                        dt = time.time() - self.t_TX
+                        print("{} {} dt={}".format(time.time(), self.msg, dt))
+
                 except Exception as e:
                     print("ERROR:Serial:read",e)
-                    pass
         else:
             #self.connect(self.port_index)
             #time.sleep(0.5)
@@ -117,5 +127,5 @@ class ThreadSerial(QtCore.QThread):
             self.read()
             self.sendAuto()
             
-            if (time.time()-self.t0>1.0/self.samplingFrequency):
-                self.t0=time.time()
+            #if (time.time()-self.t0>1.0/self.samplingFrequency):
+            #    self.t0=time.time()

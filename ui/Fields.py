@@ -32,6 +32,7 @@ class CBField(QtWidgets.QWidget):
         
 
 class PBField(QtWidgets.QPushButton):
+    """ """
     def __init__(self, path="", tool_tip="", parent=None):
         QtWidgets.QPushButton.__init__(self, parent)
 
@@ -40,6 +41,34 @@ class PBField(QtWidgets.QPushButton):
         
         self.setIcon(icon)
         self.setToolTip(tool_tip)
+
+class PBSField(QtWidgets.QPushButton):
+    """ """
+    def __init__(self, path=["",""], parent=None):
+        QtWidgets.QPushButton.__init__(self, parent)
+
+        self.iconON = QtGui.QIcon()
+        self.iconON.addPixmap(QtGui.QPixmap(path[0]), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        
+        
+        self.iconOFF = QtGui.QIcon()
+        self.iconOFF.addPixmap(QtGui.QPixmap(path[1]), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        
+        self.state = True
+        self.method = None
+        
+        self.setIcon(self.iconON)
+        
+        self.clicked.connect(self.onClick)
+    
+    def onClick(self):
+        if self.state:
+            self.setIcon(self.iconOFF)
+        else:
+            self.setIcon(self.iconON)
+        self.state = (not self.state)
+        if self.method is not None:
+            self.method(self.state)
 
 
 class SBField(QtWidgets.QWidget):
