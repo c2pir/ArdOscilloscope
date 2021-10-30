@@ -62,13 +62,13 @@ class PBSField(QtWidgets.QPushButton):
         self.clicked.connect(self.onClick)
     
     def onClick(self):
+        if self.method is not None:
+            self.method(self.state)
         if self.state:
             self.setIcon(self.iconOFF)
         else:
             self.setIcon(self.iconON)
         self.state = (not self.state)
-        if self.method is not None:
-            self.method(self.state)
 
 
 class SBField(QtWidgets.QWidget):

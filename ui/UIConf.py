@@ -17,6 +17,7 @@ class UIConf(QtWidgets.QWidget):
 
         hl0 = QtWidgets.QHBoxLayout(self)        
         self.fcbPort = CBField("Port")
+        self.fcbPort.cb.setMinimumWidth(200)
         self.fpbRefresh = PBField("img/refresh.png",tool_tip="refresh ports")
         self.fpbConnect = PBField("img/connect.png",tool_tip="connect")
         self.leCmd = QtWidgets.QLineEdit()

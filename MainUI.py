@@ -94,7 +94,6 @@ class Ui_Main(QtWidgets.QMainWindow):
         print(ind)
         self.thSerial.connect(ind)
         self.thSerial.start()
-        self.thRecorder.start()
 
     def playPause(self, play):
         if play:

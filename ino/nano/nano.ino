@@ -1,4 +1,4 @@
-const int nD = 10;
+const int nD = 11;
 const int nA = 8;
 int modeD[nD];
 int modeA[nA];
@@ -103,6 +103,8 @@ void loop() {
   for (int i=0; i<nA; i++){
     if (modeA[i]==1){
       valueA[i] = analogRead(pinA[i]);
+      // https://forum.arduino.cc/t/reading-multiple-analog-inputs/55019/18
+      delayMicroseconds(10); 
     }
   }
 
