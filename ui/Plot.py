@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Mar 07 08:22:34 2017
+
+Matplotlib displayers as PyQt object
+
 @author: arnaud1
 """
 
@@ -23,7 +26,7 @@ class CustomNavigationToolbar( NavigationToolbar ):
     def __init__(self, canvas, parent):
         NavigationToolbar.__init__(self,canvas,parent,True) # False to not show coordinates
 
-        self.pbsPlayPause = PBSField(["img/play.ico", "img/pause.png"])
+        self.pbsPlayPause = PBSField(["img/play.ico", "img/pause.png"],["play","pause"])
         self.addWidget(self.pbsPlayPause)
         
         self.clearButtons=[]
@@ -92,13 +95,17 @@ class SFigure(QtWidgets.QWidget):
         pass
     
     def draw(self, time, dataA, dataD):
+        time = np.array(time)
+        time += -time[0]
+        time = list(time)
         self.axeD.clear()
         self.axeA.clear()
         for key in dataD:
             self.axeD.plot(dataD[key], label=key)
         
         for key in dataA:
-            self.axeA.plot(dataA[key], label=key)
+            dim = min(len(time), len(dataA[key]))
+            self.axeA.scatter(time[:dim], dataA[key][:dim], label=key)
         
         self.axeD.legend()
         self.axeA.legend()

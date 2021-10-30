@@ -3,7 +3,7 @@
 """
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from .Fields import CBField, PBField
+from .Fields import CBField, PBField, PBSField
 from .PinConf import PinTable
 from .Plot import SFigure
 
@@ -18,10 +18,10 @@ class UIConf(QtWidgets.QWidget):
         hl0 = QtWidgets.QHBoxLayout(self)        
         self.fcbPort = CBField("Port")
         self.fcbPort.cb.setMinimumWidth(200)
-        self.fpbRefresh = PBField("img/refresh.png",tool_tip="refresh ports")
-        self.fpbConnect = PBField("img/connect.png",tool_tip="connect")
+        self.fpbRefresh = PBField("img/refresh.png",tool_tip="refresh ports list")
+        self.fpbsConnect = PBSField(["img/connect.png","img/disconnect.png"], ["connect","disconnect"])
         self.leCmd = QtWidgets.QLineEdit()
-        self.leCmd.setText("set:D2_1:D3_0:")
+        self.leCmd.setPlaceholderText("set:D2_1:D3_0:")
         self.fpbSend = PBField("img/send.png",tool_tip="send")
         spacerItem = QtWidgets.QSpacerItem(20, 20,
                                            QtWidgets.QSizePolicy.Expanding,
@@ -29,7 +29,7 @@ class UIConf(QtWidgets.QWidget):
         
         hl0.addWidget(self.fcbPort)
         hl0.addWidget(self.fpbRefresh)
-        hl0.addWidget(self.fpbConnect)
+        hl0.addWidget(self.fpbsConnect)
         hl0.addWidget(self.leCmd)
         hl0.addWidget(self.fpbSend)
         hl0.addItem(spacerItem)

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """
+Thread to store data from the Arduino
 """
 from PyQt5 import QtCore, QtGui, QtWidgets
 import time
@@ -14,15 +15,24 @@ class Recorder(QtCore.QThread):
         self.displayer = None
         self.updateFrequency = 2.0 #Hz
         self.last_time = time.time()
-        
-        
+
+
     def connect_to_pins(self, pins):
+        """ Initialize datas from pins """
         self.pins = pins
         self.datas = [[] for i in range(len(self.pins.json))]
         self.time = []
         self.current_index = 0
 
+
+    def flush(self):
+        for i in range(self.datas):
+            self.datas[i] = []
+        self.time = []
+        self.current_index = 0
+
     def receiveData(self, dico):
+        """ Callback to store data from arduino board """
         try:
             data = dico["list"]
             
@@ -44,8 +54,11 @@ class Recorder(QtCore.QThread):
             self.current_index = (self.current_index+1)%self.nbPoints
         except Exception as e:
             print("ERROR:Recorder:receiveData",e)
-            
+
+
     def filter_data(self):
+        """ Filter data to show 
+        return: dataA, dataD tables of analogic and digital values"""
         dataA, dataD = {}, {}
         for i in range(len(self.pins.json)):
             conf = self.pins.json[i]
@@ -54,10 +67,11 @@ class Recorder(QtCore.QThread):
             if conf["type"].startswith("A") and conf["watch"]==2:
                 dataA[conf["name"]] = self.datas[i]
         return dataA, dataD
-            
+
+
     def run(self):
         while not self.stop:
-            # TODO refresh plot
+            # FIXME perfo down on refresh plot
             if time.time()-self.last_time >= 1.0/self.updateFrequency:
                 self.last_time = time.time()
                 if self.displayer is not None:

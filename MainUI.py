@@ -6,10 +6,10 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from ui.UIConf import UIConf
 from core.com import ThreadSerial
 from core.recorder import Recorder
+from core.runner import Runner
 import json
-
-
 import os
+
 current_directory=os.getcwd()
 
 
@@ -23,6 +23,7 @@ class Ui_Main(QtWidgets.QMainWindow):
         self.result = None
         self.thSerial = ThreadSerial()
         self.thRecorder = Recorder()
+        self.thRunner = Runner(self)
         f = open(self.open_file_name ,"r")
         txt = f.read()
         f.close()
@@ -50,12 +51,14 @@ class Ui_Main(QtWidgets.QMainWindow):
         self.actionOpen = QtWidgets.QAction(self)
         self.actionSave = QtWidgets.QAction(self)
         self.actionSave_as = QtWidgets.QAction(self)
+        self.actionRunMacro = QtWidgets.QAction(self)
         
         #self.actionSee_tt_validity = QtWidgets.QAction("See training table validity",self)
         
         self.menuFile.addAction(self.actionOpen)
         self.menuFile.addAction(self.actionSave)
         self.menuFile.addAction(self.actionSave_as)
+        self.menuFile.addAction(self.actionRunMacro)
         
         #self.menuComplements.addAction(self.actionSee_tt_validity)
 
@@ -68,6 +71,7 @@ class Ui_Main(QtWidgets.QMainWindow):
         self.actionOpen.setText("Open")
         self.actionSave.setText("Save")
         self.actionSave_as.setText("Save as...")
+        self.actionRunMacro.setText("Run macro")
 
         
         
@@ -75,12 +79,14 @@ class Ui_Main(QtWidgets.QMainWindow):
         self.actionOpen.triggered.connect(self.open_)
         self.actionSave_as.triggered.connect(self.saveAs)
         self.actionSave.triggered.connect(self.save)
+        self.actionRunMacro.triggered.connect(self.open_macro)
         self.actionOpen.setShortcut("Ctrl+O")
         self.actionSave.setShortcut("Ctrl+S")
+        self.actionRunMacro.setShortcut("Ctrl+R")
         self.centralwidget.flwPins.sChangeMode.connect(self.changeMode)
         self.centralwidget.flwPins.sChangeWatch.connect(self.changeWatch)
         self.centralwidget.fpbRefresh.clicked.connect(self.refresh)
-        self.centralwidget.fpbConnect.clicked.connect(self.connect)
+        self.centralwidget.fpbsConnect.method = self.connectDisconnect #clicked.connect(self.connect)
         self.centralwidget.fpbSend.clicked.connect(self.send)
         self.centralwidget.figure.mpl_toolbar.pbsPlayPause.method = self.playPause
         self.thSerial.sData.connect(self.thRecorder.receiveData)
@@ -88,28 +94,44 @@ class Ui_Main(QtWidgets.QMainWindow):
         self.thRecorder.connect_to_pins(self.centralwidget.flwPins)
         self.thRecorder.displayer = self.centralwidget.figure
         
-        
-    def connect(self):
+        self.refresh()
+
+
+    def connectDisconnect(self, b):
         ind = self.centralwidget.fcbPort.cb.currentIndex()
         print(ind)
-        self.thSerial.connect(ind)
-        self.thSerial.start()
+        
+        if self.thSerial.ser is not None:
+            if self.thSerial.ser.isOpen():
+                self.thSerial.stop = True
+                self.thSerial.disconnect()
+            res = True
+        else:
+            self.thSerial.stop = False
+            res = not self.thSerial.connect(ind)
+            self.thSerial.start()
+        return res
+
 
     def playPause(self, play):
         if play:
             self.thRecorder.stop = False
             self.thRecorder.start()
+            return False
         else:
             self.thRecorder.stop = True
-        
+            return True
+
 
     def refresh(self):
         self.thSerial.refresh()
         self.centralwidget.fcbPort.load(self.thSerial.ports)
 
+
     def send(self):
         cmd = self.centralwidget.leCmd.text()
         self.thSerial.send(cmd)
+
 
     def changeMode(self, conf):
         #print(conf)
@@ -118,10 +140,11 @@ class Ui_Main(QtWidgets.QMainWindow):
                                     conf["mode"])
         self.thSerial.send(cmd)
 
+
     def changeWatch(self, conf):
         print(conf)
-    
-    
+
+
     def save(self):
         if self.open_file_name==-1:
             self.saveAs()
@@ -131,7 +154,8 @@ class Ui_Main(QtWidgets.QMainWindow):
             file_.write(txt)
             file_.close()
             print("File saved")
-    
+
+
     def saveAs(self):
         f = QtWidgets.QFileDialog()
         f.setMaximumSize(700,400)
@@ -151,6 +175,7 @@ class Ui_Main(QtWidgets.QMainWindow):
             file_.close()
             self.open_file_name = filename
 
+
     def open_(self):
         f = QtWidgets.QFileDialog()
         f.setMaximumSize(700,400)
@@ -169,14 +194,32 @@ class Ui_Main(QtWidgets.QMainWindow):
             d = eval(JSON)
             self.centralwidget.flwPins.load(d)
             self.open_file_name = filename
-    
+
+
+    def open_macro(self):
+        f = QtWidgets.QFileDialog()
+        f.setMaximumSize(700,400)
+        f.setWindowModality(QtCore.Qt.WindowModal)
+        filename = f.getOpenFileName(self, 'Open macro',
+                                     current_directory+"/macros",
+                                     filter="macro (*.py)")
+        if type(filename)!=str:
+            filename=filename[0]
+        else:
+            filename=str(filename)
+        if filename != "":
+            name = os.path.basename(filename).split(".")[0] 
+            self.thRunner.name = name
+            self.thRunner.start()
+
 
     def closeEvent(self, event):
         self.thSerial.stop = True
         self.thRecorder.stop = True
         self.thSerial.disconnect()
         event.accept()
-    
+
+
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv) #
