@@ -9,7 +9,7 @@
 	{
 		"name": "D3",
 		"id": 1,
-		"type": "DIO",
+		"type": "DIO|PWM",
 		"watch": 0,
 		"mode": 0
 	},
@@ -23,14 +23,14 @@
 	{
 		"name": "D5",
 		"id": 3,
-		"type": "DIO",
+		"type": "DIO|PWM",
 		"watch": 0,
 		"mode": 0
 	},
 	{
 		"name": "D6",
 		"id": 4,
-		"type": "DIO",
+		"type": "DIO|PWM",
 		"watch": 0,
 		"mode": 0
 	},
@@ -51,21 +51,21 @@
 	{
 		"name": "D9",
 		"id": 7,
-		"type": "DIO",
+		"type": "DIO|PWM",
 		"watch": 0,
 		"mode": 0
 	},
 	{
 		"name": "D10",
 		"id": 8,
-		"type": "DIO",
+		"type": "DIO|PWM",
 		"watch": 0,
 		"mode": 0
 	},
 	{
 		"name": "D11",
 		"id": 9,
-		"type": "DIO",
+		"type": "DIO|PWM",
 		"watch": 0,
 		"mode": 0
 	},

@@ -73,19 +73,25 @@ def configure_pin(cls, name, mode=0, watch=True):
         row +=1
     pass
 
-def set_pin(cls, name, value):
+def set_pin(cls, names, values):
     """Set a pin in write mode to the given value
-    name: pin name (as shown in the UI
-    value: 
+    names: list of pins names (as shown in the UI
+    values: list of pin values
     """
-    row = 0
-    for conf in cls.centralwidget.flwPins.json:
-        if conf["name"]==name:
-            if ("D" in conf["type"]) and ("I" in conf["type"]):
-                cls.thSerial.send("set:D{}_{}:".format(conf["id"], value))
-            # TODO analog write
-            # TODO PWM
-        row+=1
+    cmd = "set:"
+    
+    for i in range(len(names)):
+        row = 0
+        for conf in cls.centralwidget.flwPins.json:
+            if conf["name"]==names[i]:
+                # digital write
+                if ("D" in conf["type"]) and ("I" in conf["type"]) and (conf["mode"]==2):
+                    cmd += "D{}_{}:".format(conf["id"], values[i])
+                # analog write (PWM)
+                if conf["mode"]==3:
+                    cmd += "A{}_{}:".format(conf["id"], values[i])
+            row+=1
+    cls.thSerial.send(cmd)
 
 def save_data_as_csv(cls, file_name, separator=";"):
     """Save recordeed data as csv (you need to call start_recording before)

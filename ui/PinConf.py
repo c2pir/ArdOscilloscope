@@ -76,6 +76,8 @@ class CBBMode(QtWidgets.QComboBox):
             options.append("Read")
         if "O" in type_:
             options.append("Write")
+        if "PWM" in type_:
+            options.append("PWM")
         self.addItems(options)
 
 

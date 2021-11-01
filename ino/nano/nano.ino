@@ -4,7 +4,7 @@ int modeD[nD];
 int modeA[nA];
 int pinD[nD]; 
 int pinA[nA] = {A0, A1, A2, A3, A4, A5, A6, A7};
-bool valueD[nD];
+int valueD[nD];
 int valueA[nA];
 String msg;
 
@@ -85,6 +85,12 @@ void loop() {
             valueD[pinId] = pinValue;
             // WRITE
             digitalWrite(pinD[pinId], valueD[pinId]);
+            Serial.println("ACK:"+msg);
+          }
+
+          if (pinType=="A"){
+            valueD[pinId] = pinValue;
+            analogWrite(pinD[pinId], valueD[pinId]);
             Serial.println("ACK:"+msg);
           }
           start = i+1;

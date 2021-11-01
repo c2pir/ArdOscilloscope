@@ -12,9 +12,9 @@ def run(cls):
 		cmd.start_recording(cls, show = False)
 		
 		for i in range(3):
-			cmd.set_pin(cls, "D4", 1)
+			cmd.set_pin(cls, ["D4"], [1])
 			time.sleep(2.0)
-			cmd.set_pin(cls, "D4", 0)
+			cmd.set_pin(cls, ["D4"], [0])
 			time.sleep(2.0)
 		
 		time.sleep(3.0)

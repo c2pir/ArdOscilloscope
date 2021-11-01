@@ -4,6 +4,7 @@ Thread to store data from the Arduino
 """
 from PyQt5 import QtCore, QtGui, QtWidgets
 import time
+import numpy as np
 
 class Recorder(QtCore.QThread):
 
@@ -76,7 +77,10 @@ class Recorder(QtCore.QThread):
             for i in range(len(self.pins.json)):
                 conf = self.pins.json[i]
                 if conf["type"].startswith("D") and conf["watch"]==2:
-                    dataD[conf["name"]] = self.datas[i]
+                    val = np.array(self.datas[i], dtype=float)
+                    if conf["mode"]==3: # PWM display
+                        val *= 1.0/255.0
+                    dataD[conf["name"]] = list(val)
                 if conf["type"].startswith("A") and conf["watch"]==2:
                     dataA[conf["name"]] = self.datas[i]
             self.mutexData.unlock()
