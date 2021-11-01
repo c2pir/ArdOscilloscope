@@ -68,13 +68,12 @@ class SFigure(QtWidgets.QWidget):
         
         self.canvas = FigureCanvas(self.fig)
         self.canvas.setParent(self)
-#        self.canvas.mpl_connect('button_release_event',self.onRelease)
-#        self.canvas.mpl_connect('motion_notify_event',self.onMouseMove)
+        #self.canvas.mpl_connect('button_release_event',self.onRelease)
+        #self.canvas.mpl_connect('motion_notify_event',self.onMouseMove)
         self.canvas.mpl_connect('button_press_event',self.onPress)
         
         self.axeD = self.fig.add_subplot(211)
         self.axeA = self.fig.add_subplot(212)
-        self.nbPoints = 500
                 
         # Create the navigation toolbar, tied to the canvas
         self.mpl_toolbar = CustomNavigationToolbar(self.canvas, self)

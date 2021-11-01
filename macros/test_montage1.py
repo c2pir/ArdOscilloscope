@@ -16,3 +16,4 @@ def run(cls):
 		time.sleep(2.0)
 	
 	cmd.stop_recording(cls)
+	cmd.save_data_as_csv(cls, "results.csv")

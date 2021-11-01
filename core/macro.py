@@ -44,3 +44,30 @@ def set_pin(cls, name, value):
                 cls.thSerial.send("set:D{}_{}:".format(conf["id"], value))
         row+=1
 
+def save_data_as_csv(cls, file_name, separator=";"):
+    t = cls.thRecorder.time
+    dataA, dataD = cls.thRecorder.filter_data()
+    
+    csv = "time;"
+    # headers
+    for key in dataA:
+        csv+=key+separator
+    for key in dataD:
+        csv+=key+separator
+    csv += "\n"
+    
+    # datas
+    for i in range(cls.thRecorder.nbPoints):
+        if i<len(t):
+            csv += str(t[i])+separator
+        for key in dataA:
+            if i<len(dataA[key]):
+                csv += str(dataA[key][i])+separator
+        for key in dataD:
+            if i<len(dataD[key]):
+                csv += str(dataD[key][i])+separator
+        csv += "\n"
+    
+    f = open(file_name, "w")
+    f.write(csv)
+    f.close()

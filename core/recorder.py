@@ -13,7 +13,7 @@ class Recorder(QtCore.QThread):
         self.nbPoints = 1000
         self.stop = False
         self.displayer = None
-        self.updateFrequency = 2.0 #Hz
+        self.updateFrequency = 1.5 #Hz
         self.last_time = time.time()
 
 
@@ -76,5 +76,6 @@ class Recorder(QtCore.QThread):
                 self.last_time = time.time()
                 if self.displayer is not None:
                     dataA, dataD = self.filter_data()
+                    # FIXME: this block data reception
                     self.displayer.draw(self.time, dataA, dataD)
                 time.sleep(0.2)
