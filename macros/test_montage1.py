@@ -5,16 +5,16 @@ def run(cls):
 	
 	if cmd.connect(cls, "COM8"):
 		
-		cmd.configure_pin(cls, "D4", mode=2)
+		cmd.configure_pin(cls, "D3", mode=2)
 		cmd.configure_pin(cls, "A1", mode=1)
 		cmd.configure_pin(cls, "A2", mode=1)
 		
 		cmd.start_recording(cls, show = False)
 		
 		for i in range(3):
-			cmd.set_pin(cls, ["D4"], [1])
+			cmd.set_pin(cls, ["D3"], [1])
 			time.sleep(2.0)
-			cmd.set_pin(cls, ["D4"], [0])
+			cmd.set_pin(cls, ["D3"], [0])
 			time.sleep(2.0)
 		
 		time.sleep(3.0)

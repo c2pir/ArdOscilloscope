@@ -134,9 +134,12 @@ class Ui_Main(QtWidgets.QMainWindow):
 
     def changeMode(self, conf):
         #print(conf)
+        mode = conf["mode"]
+        if mode==3 and ("PWM" in conf["type"]): # PWM case
+            mode = 2
         cmd = "par:{}:{}:{}".format(conf["type"][0],
                                     conf["id"],
-                                    conf["mode"])
+                                    mode)
         self.thSerial.send(cmd)
 
 
