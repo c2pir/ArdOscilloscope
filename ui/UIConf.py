@@ -22,7 +22,8 @@ class UIConf(QtWidgets.QWidget):
         self.fpbsConnect = PBSField(["img/connect.png","img/disconnect.png"], ["connect","disconnect"])
         self.leCmd = QtWidgets.QLineEdit()
         self.leCmd.setPlaceholderText("set:D2_1:D3_0:")
-        self.fpbSend = PBField("img/send.png",tool_tip="send")
+        self.leCmd.setToolTip("direct serial command for arduino board")
+        self.fpbSend = PBField("img/send.png",tool_tip="send command")
         spacerItem = QtWidgets.QSpacerItem(20, 20,
                                            QtWidgets.QSizePolicy.Expanding,
                                            QtWidgets.QSizePolicy.Minimum)

@@ -13,8 +13,10 @@ class Recorder(QtCore.QThread):
         self.nbPoints = 1000
         self.stop = False
         self.displayer = None
-        self.updateFrequency = 1.5 #Hz
+        self.update_displayer = True
+        self.updateFrequency = 2.0 #Hz
         self.last_time = time.time()
+        self.mutexData = QtCore.QMutex()
 
 
     def connect_to_pins(self, pins):
@@ -26,56 +28,72 @@ class Recorder(QtCore.QThread):
 
 
     def flush(self):
-        for i in range(self.datas):
-            self.datas[i] = []
-        self.time = []
-        self.current_index = 0
+        if self.mutexData.tryLock(10):
+            for i in range(len(self.datas)):
+                self.datas[i] = []
+            self.time = []
+            self.current_index = 0
+            self.mutexData.unlock()
+            return True
+        return False
 
     def receiveData(self, dico):
         """ Callback to store data from arduino board """
         try:
             data = dico["list"]
             
-            if len(self.time)==self.nbPoints:
-                self.time[self.current_index] = dico["timestamp"]
-            else:
-                self.time.append(dico["timestamp"])
-            
-            
-            for i in range(len(data)):
-                if i>=len(self.datas):
-                    break
+            if self.mutexData.tryLock(10):
                 
-                if len(self.datas[i])==self.nbPoints:
-                    self.datas[i][self.current_index] = int(data[i])
+                if len(self.time)==self.nbPoints:
+                    self.time[self.current_index] = dico["timestamp"]
                 else:
-                    self.datas[i].append(int(data[i]))
+                    self.time.append(dico["timestamp"])
+                
+                
+                for i in range(len(data)):
+                    if i>=len(self.datas):
+                        break
                     
-            self.current_index = (self.current_index+1)%self.nbPoints
+                    if len(self.datas[i])==self.nbPoints:
+                        self.datas[i][self.current_index] = int(data[i])
+                    else:
+                        self.datas[i].append(int(data[i]))
+                        
+                self.current_index = (self.current_index+1)%self.nbPoints
+                
+                self.mutexData.unlock()
+                return True
         except Exception as e:
             print("ERROR:Recorder:receiveData",e)
+        return False
 
 
     def filter_data(self):
         """ Filter data to show 
         return: dataA, dataD tables of analogic and digital values"""
         dataA, dataD = {}, {}
-        for i in range(len(self.pins.json)):
-            conf = self.pins.json[i]
-            if conf["type"].startswith("D") and conf["watch"]==2:
-                dataD[conf["name"]] = self.datas[i]
-            if conf["type"].startswith("A") and conf["watch"]==2:
-                dataA[conf["name"]] = self.datas[i]
+        if self.mutexData.tryLock(200):
+            for i in range(len(self.pins.json)):
+                conf = self.pins.json[i]
+                if conf["type"].startswith("D") and conf["watch"]==2:
+                    dataD[conf["name"]] = self.datas[i]
+                if conf["type"].startswith("A") and conf["watch"]==2:
+                    dataA[conf["name"]] = self.datas[i]
+            self.mutexData.unlock()
         return dataA, dataD
+
+
+    def show(self):
+        if self.update_displayer:
+            dataA, dataD = self.filter_data()
+            self.displayer.draw(self.time, dataA, dataD)
 
 
     def run(self):
         while not self.stop:
-            # FIXME perfo down on refresh plot
             if time.time()-self.last_time >= 1.0/self.updateFrequency:
                 self.last_time = time.time()
                 if self.displayer is not None:
-                    dataA, dataD = self.filter_data()
-                    # FIXME: this block data reception
-                    self.displayer.draw(self.time, dataA, dataD)
-                time.sleep(0.2)
+                    self.show()
+                # if data reception is blocked, increase this sleep time
+                time.sleep(0.6)

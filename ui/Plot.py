@@ -74,7 +74,8 @@ class SFigure(QtWidgets.QWidget):
         
         self.axeD = self.fig.add_subplot(211)
         self.axeA = self.fig.add_subplot(212)
-                
+        self.fig.text(0.5, 0.04, "time (s)", ha='center')
+        
         # Create the navigation toolbar, tied to the canvas
         self.mpl_toolbar = CustomNavigationToolbar(self.canvas, self)
         
@@ -94,17 +95,22 @@ class SFigure(QtWidgets.QWidget):
         pass
     
     def draw(self, time, dataA, dataD):
+        if len(time)==0:
+            return
         time = np.array(time)
         time += -time[0]
         time = list(time)
         self.axeD.clear()
         self.axeA.clear()
         for key in dataD:
-            self.axeD.plot(dataD[key], label=key)
+            dim = min(len(time), len(dataD[key]))
+            new_x, new_y = zip(*sorted(zip(time[:dim], dataD[key][:dim])))
+            self.axeD.plot(new_x, new_y, label=key)
         
         for key in dataA:
             dim = min(len(time), len(dataA[key]))
-            self.axeA.scatter(time[:dim], dataA[key][:dim], label=key)
+            new_x, new_y = zip(*sorted(zip(time[:dim], dataA[key][:dim])))
+            self.axeA.plot(new_x, new_y, label=key)
         
         self.axeD.legend()
         self.axeA.legend()

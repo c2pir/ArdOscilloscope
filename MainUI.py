@@ -99,7 +99,6 @@ class Ui_Main(QtWidgets.QMainWindow):
 
     def connectDisconnect(self, b):
         ind = self.centralwidget.fcbPort.cb.currentIndex()
-        print(ind)
         
         if self.thSerial.ser is not None:
             if self.thSerial.ser.isOpen():
@@ -153,7 +152,7 @@ class Ui_Main(QtWidgets.QMainWindow):
             file_=open(self.open_file_name,'w')
             file_.write(txt)
             file_.close()
-            print("File saved")
+            print("File {} saved".format(self.open_file_name))
 
 
     def saveAs(self):

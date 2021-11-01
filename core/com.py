@@ -35,7 +35,6 @@ class ThreadSerial(QtCore.QThread):
     def refresh(self):
         """ Refresh alvailable ports list """
         self.ports = list(serial.tools.list_ports.comports())
-        print(self.ports)
 
 
     def connect(self,i):
@@ -103,8 +102,8 @@ class ThreadSerial(QtCore.QThread):
                     
                 except Exception as e:
                     print("ERROR:Serial:sendAuto",e)
-                    print(e)
-            
+
+
     def read(self):
         """Read one line"""
         if self.ser is not None:
