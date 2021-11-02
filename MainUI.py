@@ -44,7 +44,7 @@ class Ui_Main(QtWidgets.QMainWindow):
         self.menubar = QtWidgets.QMenuBar(self)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1353, 26))
         self.menuFile = QtWidgets.QMenu(self.menubar)
-        self.menuComplements = QtWidgets.QMenu("Complements",self.menubar)
+        self.menuHelp = QtWidgets.QMenu("Help",self.menubar)
         self.setMenuBar(self.menubar)
         self.actionShow = QtWidgets.QAction(self)
         self.actionNew = QtWidgets.QAction(self)
@@ -53,17 +53,17 @@ class Ui_Main(QtWidgets.QMainWindow):
         self.actionSave_as = QtWidgets.QAction(self)
         self.actionRunMacro = QtWidgets.QAction(self)
         
-        #self.actionSee_tt_validity = QtWidgets.QAction("See training table validity",self)
+        self.actionUserManual = QtWidgets.QAction("User manual",self)
         
         self.menuFile.addAction(self.actionOpen)
         self.menuFile.addAction(self.actionSave)
         self.menuFile.addAction(self.actionSave_as)
         self.menuFile.addAction(self.actionRunMacro)
         
-        #self.menuComplements.addAction(self.actionSee_tt_validity)
+        self.menuHelp.addAction(self.actionUserManual)
 
         self.menubar.addAction(self.menuFile.menuAction())
-        #self.menubar.addAction(self.menuComplements.menuAction())
+        self.menubar.addAction(self.menuHelp.menuAction())
         
         
         
@@ -226,7 +226,8 @@ if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv) #
     icon = QtGui.QIcon()
-    icon.addFile("img/Brain-Icon.png",QtCore.QSize(24,24))
+    icon.addFile("img/monitor.png",QtCore.QSize(24,24))
+    QtWidgets.QApplication.setStyle(QtWidgets.QStyleFactory.create('Fusion'))
     app.setWindowIcon(icon)
     MainWindow = Ui_Main()
     MainWindow.show()

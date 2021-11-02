@@ -22,5 +22,10 @@ class Runner(QtCore.QThread):
             my_macro.run(self.ui)
         except Exception as e:
             print(e)
+        
+        # TODO unload module
+        #setattr(module, self.name, None)
+        
+        
         print("END OF MACRO")
         self.sEnd.emit()

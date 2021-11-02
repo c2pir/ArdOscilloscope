@@ -1,0 +1,128 @@
+[
+	{
+		"name": "D2",
+		"id": 0,
+		"type": "DIO",
+		"watch": 0,
+		"mode": 0
+	},
+	{
+		"name": "D3",
+		"id": 1,
+		"type": "DIO|PWM",
+		"watch": 0,
+		"mode": 0
+	},
+	{
+		"name": "D4",
+		"id": 2,
+		"type": "DIO",
+		"watch": 0,
+		"mode": 0
+	},
+	{
+		"name": "D5",
+		"id": 3,
+		"type": "DIO|PWM",
+		"watch": 0,
+		"mode": 0
+	},
+	{
+		"name": "D6",
+		"id": 4,
+		"type": "DIO|PWM",
+		"watch": 0,
+		"mode": 0
+	},
+	{
+		"name": "D7",
+		"id": 5,
+		"type": "DIO",
+		"watch": 0,
+		"mode": 0
+	},
+	{
+		"name": "D8",
+		"id": 6,
+		"type": "DIO",
+		"watch": 0,
+		"mode": 0
+	},
+	{
+		"name": "D9",
+		"id": 7,
+		"type": "DIO|PWM",
+		"watch": 0,
+		"mode": 0
+	},
+	{
+		"name": "D10",
+		"id": 8,
+		"type": "DIO|PWM",
+		"watch": 0,
+		"mode": 0
+	},
+	{
+		"name": "D11",
+		"id": 9,
+		"type": "DIO|PWM",
+		"watch": 0,
+		"mode": 0
+	},
+	{
+		"name": "D12",
+		"id": 10,
+		"type": "DIO",
+		"watch": 0,
+		"mode": 0
+	},
+	{
+		"name": "D13",
+		"id": 11,
+		"type": "DIO",
+		"watch": 0,
+		"mode": 0
+	},
+	{
+		"name": "A0",
+		"id": 0,
+		"type": "AI",
+		"watch": 0,
+		"mode": 0
+	},
+	{
+		"name": "A1",
+		"id": 1,
+		"type": "AI",
+		"watch": 0,
+		"mode": 0
+	},
+	{
+		"name": "A2",
+		"id": 2,
+		"type": "AI",
+		"watch": 0,
+		"mode": 0
+	},
+	{
+		"name": "A3",
+		"id": 3,
+		"type": "AI",
+		"watch": 0,
+		"mode": 0
+	},
+	{
+		"name": "A4",
+		"id": 4,
+		"type": "AI",
+		"watch": 0,
+		"mode": 0
+	},
+	{
+		"name": "A5",
+		"id": 5,
+		"type": "AI",
+		"watch": 0,
+		"mode": 0
+	}
+]
