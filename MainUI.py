@@ -75,17 +75,19 @@ class Ui_Main(QtWidgets.QMainWindow):
         self.actionOpen.triggered.connect(self.open_conf)
         self.actionSave_as.triggered.connect(self.saveAs)
         self.actionSave.triggered.connect(self.save)
-        self.actionRunMacro.triggered.connect(self.open_macro)
+        self.actionRunMacro.triggered.connect(self.centralwidget.fpbsMacro.clicked.emit) 
         self.actionOpen.setShortcut("Ctrl+O")
         self.actionSave.setShortcut("Ctrl+S")
         self.actionRunMacro.setShortcut("Ctrl+R")
         self.centralwidget.flwPins.sChangeMode.connect(self.changeMode)
         self.centralwidget.flwPins.sChangeWatch.connect(self.changeWatch)
         self.centralwidget.fpbRefresh.clicked.connect(self.refresh)
-        self.centralwidget.fpbsConnect.method = self.connectDisconnect #clicked.connect(self.connect)
+        self.centralwidget.fpbsConnect.method = self.connectDisconnect
+        self.centralwidget.fpbsMacro.method = self.startStop
         self.centralwidget.fpbSend.clicked.connect(self.send)
         self.centralwidget.figure.mpl_toolbar.pbsPlayPause.method = self.playPause
         self.thSerial.sData.connect(self.thRecorder.receiveData)
+        self.thRunner.sEnd.connect(self.centralwidget.fpbsMacro.clicked.emit)
         
         self.thRecorder.displayer = self.centralwidget.figure
         
@@ -195,6 +197,15 @@ class Ui_Main(QtWidgets.QMainWindow):
             self.setWindowTitle("ArdOscil [{}]".format(self.open_file_name))
 
 
+    def startStop(self, b):
+        if b:
+            self.open_macro()
+        else:
+            self.thRunner.terminate()
+            # TODO wait for isRunning to be False
+        return not b
+
+
     def open_macro(self):
         f = QtWidgets.QFileDialog()
         f.setMaximumSize(700,400)
@@ -222,7 +233,7 @@ class Ui_Main(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv) 
-    QtWidgets.QApplication.setStyle(QtWidgets.QStyleFactory.create('Fusion'))
+    #QtWidgets.QApplication.setStyle(QtWidgets.QStyleFactory.create('Fusion'))
 
     MainWindow = Ui_Main()
     MainWindow.show()

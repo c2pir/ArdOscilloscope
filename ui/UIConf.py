@@ -27,13 +27,15 @@ class UIConf(QtWidgets.QWidget):
         spacerItem = QtWidgets.QSpacerItem(20, 20,
                                            QtWidgets.QSizePolicy.Expanding,
                                            QtWidgets.QSizePolicy.Minimum)
+        self.fpbsMacro = PBSField(["img/led-red-on.png","img/green-led-on.png"], ["run macro","stop current macro"])
         
         hl0.addWidget(self.fcbPort)
         hl0.addWidget(self.fpbRefresh)
         hl0.addWidget(self.fpbsConnect)
         hl0.addWidget(self.leCmd)
         hl0.addWidget(self.fpbSend)
-        hl0.addItem(spacerItem)
+        hl0.addWidget(self.fpbsMacro)
+        hl0.addItem(spacerItem)        
 
         self.fcbPin = CBField("Pin", options=["D{}".format(i) for i in range(2,13)])
 
