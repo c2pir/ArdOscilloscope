@@ -35,8 +35,12 @@ void loop() {
 
   // read order from the computer
   if (Serial.available()) {
-    msg = Serial.readString(); // read the incoming data as string
+    msg = Serial.readStringUntil('\n'); // read the incoming data as string
 
+    if (msg.substring(0,3)=="GET") {
+      Serial.println("ERROR");  
+    }
+    
     // SET PIN MODE
     //par:D:2:2
     if (msg.substring(0,3)=="par") {
@@ -125,6 +129,7 @@ void loop() {
       Serial.print(":"+String(valueA[i]));
     }
     Serial.println(":");
+    Serial.flush();
     cpt = 0;  
   }
   

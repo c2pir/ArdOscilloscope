@@ -95,7 +95,7 @@ class ThreadSerial(QtCore.QThread):
             if len(self.cmd)>0:
                 try:
                     # TODO gestion python 2.0 (str) ou 3.0 (encode)
-                    cmd = self.cmd[0]+"\n"
+                    cmd = self.cmd[0] + "\n"
                     self.ser.write(cmd.encode())
                     self.t_TX = time.time()
                     if self.mutexCmd.tryLock(100):
