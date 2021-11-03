@@ -3,6 +3,7 @@
 """
 import time
 
+
 def refresh_port_list():
     # TODO
     return []
@@ -90,8 +91,24 @@ def set_pin(cls, names, values):
                 # analog write (PWM)
                 if conf["mode"]==3:
                     cmd += "A{}_{}:".format(conf["id"], values[i])
+                break
             row+=1
     cls.thSerial.send(cmd)
+
+def get_pin(cls, names):
+    """ """
+    res = []
+    for i in range(len(names)):
+        row = 0
+        for conf in cls.centralwidget.flwPins.json:
+            if conf["name"]==names[i]:
+                try:
+                    v = cls.thRecorder.current_pins_values[row]
+                    res.append(v)
+                except Exception as e:
+                    print("ERROR:MACRO:get_pin",e)
+            row += 1
+    return res
 
 def save_data_as_csv(cls, file_name, separator=";"):
     """Save recordeed data as csv (you need to call start_recording before)

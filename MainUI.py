@@ -17,7 +17,14 @@ class Ui_Main(QtWidgets.QMainWindow):
     """ Main window object """
     def __init__(self, parent=None):
         QtWidgets.QMainWindow.__init__(self, parent)
-
+        self.resize(1024, 680)
+        
+        self.setWindowTitle("ArdOscil")
+        
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("img/monitor.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.setWindowIcon(icon)
+        
         # VARIABLES
         self.open_file_name = "conf/Arduino nano.json"
         self.result = None
@@ -30,13 +37,6 @@ class Ui_Main(QtWidgets.QMainWindow):
         d = eval(txt)
         
         ## GUI
-        self.resize(1353, 812)
-        
-        self.setWindowTitle("ArdOscil")
-        
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("img/monitor.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.setWindowIcon(icon)
         self.centralwidget = UIConf(d)
         self.setCentralWidget(self.centralwidget)
         
@@ -76,7 +76,7 @@ class Ui_Main(QtWidgets.QMainWindow):
         
         
         # BINDINGS
-        self.actionOpen.triggered.connect(self.open_)
+        self.actionOpen.triggered.connect(self.open_conf)
         self.actionSave_as.triggered.connect(self.saveAs)
         self.actionSave.triggered.connect(self.save)
         self.actionRunMacro.triggered.connect(self.open_macro)
@@ -178,7 +178,7 @@ class Ui_Main(QtWidgets.QMainWindow):
             self.open_file_name = filename
 
 
-    def open_(self):
+    def open_conf(self):
         f = QtWidgets.QFileDialog()
         f.setMaximumSize(700,400)
         f.setWindowModality(QtCore.Qt.WindowModal)
@@ -224,14 +224,13 @@ class Ui_Main(QtWidgets.QMainWindow):
 
 if __name__ == "__main__":
     import sys
-    app = QtWidgets.QApplication(sys.argv) #
-    icon = QtGui.QIcon()
-    icon.addFile("img/monitor.png",QtCore.QSize(24,24))
+    app = QtWidgets.QApplication(sys.argv) 
     QtWidgets.QApplication.setStyle(QtWidgets.QStyleFactory.create('Fusion'))
-    app.setWindowIcon(icon)
+
     MainWindow = Ui_Main()
     MainWindow.show()
     #MainWindow.showMaximized()
     
-    sys.exit(app.exec_())
+    app.exec_()
+    sys.exit()
 

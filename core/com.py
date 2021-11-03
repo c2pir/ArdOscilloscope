@@ -45,7 +45,7 @@ class ThreadSerial(QtCore.QThread):
                 self.disconnect()
                 self.port_index = i
                 self.ser = serial.Serial(self.ports[i].device,timeout=2.0)
-                self.ser.baudrate = 19200 #250000
+                self.ser.baudrate = 115200 #38400 #19200 #250000
                 print("INFO:Serial: connected to "+str(self.ports[i].device))
                 return True
         except:
@@ -73,10 +73,12 @@ class ThreadSerial(QtCore.QThread):
     def send(self,msg):
         """Add msg to the queue"""
         try:
-            if self.mutexCmd.tryLock(10):
+            if self.mutexCmd.tryLock(100):
                 self.cmd.append(msg)
                 self.mutexCmd.unlock()
-            
+                #print("ADD TO QUEUE: {}".format(msg))
+            else:
+                print("WARN: cmd not added to queue")
         except Exception as e:
             print("ERROR:Serial:send:",e)
             self.ConnexionError.emit(True)
@@ -93,13 +95,15 @@ class ThreadSerial(QtCore.QThread):
             if len(self.cmd)>0:
                 try:
                     # TODO gestion python 2.0 (str) ou 3.0 (encode)
-                    self.ser.write(self.cmd[0].encode())
+                    cmd = self.cmd[0]+"\n"
+                    self.ser.write(cmd.encode())
                     self.t_TX = time.time()
-                    print(self.t_TX, self.cmd[0])
-                    if self.mutexCmd.tryLock(10):
+                    if self.mutexCmd.tryLock(100):
                         del self.cmd[0]
                         self.mutexCmd.unlock()
-                    
+                    else:
+                        print("WARN: cmd not send")
+                    print(self.t_TX, cmd[:-1])
                 except Exception as e:
                     print("ERROR:Serial:sendAuto",e)
 
@@ -124,7 +128,7 @@ class ThreadSerial(QtCore.QThread):
                     
                     if self.msg.startswith("ACK"):
                         dt = time.time() - self.t_TX
-                        print("{} {} dt={}".format(time.time(), self.msg, dt))
+                        print("{} {} dt={}".format(time.time(), self.msg[:-1], dt))
                     
                 except Exception as e:
                     print("ERROR:Serial:read",e)

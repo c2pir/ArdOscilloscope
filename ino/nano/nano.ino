@@ -25,7 +25,7 @@ void init_pins_variables(){
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(19200);
+  Serial.begin(115200); // 19200
   Serial.setTimeout(100);
   init_pins_variables();
 }

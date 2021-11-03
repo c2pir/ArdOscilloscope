@@ -15,6 +15,7 @@ class Recorder(QtCore.QThread):
         self.stop = False
         self.displayer = None
         self.update_displayer = True
+        self.current_pins_values = []
         self.updateFrequency = 2.0 #Hz
         self.last_time = time.time()
         self.mutexData = QtCore.QMutex()
@@ -42,6 +43,7 @@ class Recorder(QtCore.QThread):
         """ Callback to store data from arduino board """
         try:
             data = dico["list"]
+            self.current_pins_values = [int(v) for v in data]
             
             if self.mutexData.tryLock(10):
                 

@@ -15,7 +15,7 @@ class UIConf(QtWidgets.QWidget):
         vl = QtWidgets.QVBoxLayout(self)
         vl.setContentsMargins(6, 6, 6, 6)
 
-        hl0 = QtWidgets.QHBoxLayout(self)        
+        hl0 = QtWidgets.QHBoxLayout()        
         self.fcbPort = CBField("Port")
         self.fcbPort.cb.setMinimumWidth(200)
         self.fpbRefresh = PBField("img/refresh.png",tool_tip="refresh ports list")
@@ -37,7 +37,7 @@ class UIConf(QtWidgets.QWidget):
 
         self.fcbPin = CBField("Pin", options=["D{}".format(i) for i in range(2,13)])
 
-        hl = QtWidgets.QHBoxLayout(self)
+        hl = QtWidgets.QHBoxLayout()
         
         self.flwPins = PinTable(self)
         self.figure = SFigure()
