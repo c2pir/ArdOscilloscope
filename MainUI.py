@@ -19,11 +19,11 @@ class Ui_Main(QtWidgets.QMainWindow):
         QtWidgets.QMainWindow.__init__(self, parent)
         self.resize(1024, 680)
         
-        self.setWindowTitle("ArdOscil")
-        
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("img/monitor.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.setWindowIcon(icon)
+        
+        self.setWindowTitle("ArdOscil")
         
         # VARIABLES
         self.open_file_name = "conf/Arduino nano.json"
@@ -31,13 +31,9 @@ class Ui_Main(QtWidgets.QMainWindow):
         self.thSerial = ThreadSerial()
         self.thRecorder = Recorder()
         self.thRunner = Runner(self)
-        f = open(self.open_file_name ,"r")
-        txt = f.read()
-        f.close()
-        d = eval(txt)
         
         ## GUI
-        self.centralwidget = UIConf(d)
+        self.centralwidget = UIConf({})
         self.setCentralWidget(self.centralwidget)
         
         
@@ -91,7 +87,6 @@ class Ui_Main(QtWidgets.QMainWindow):
         self.centralwidget.figure.mpl_toolbar.pbsPlayPause.method = self.playPause
         self.thSerial.sData.connect(self.thRecorder.receiveData)
         
-        self.thRecorder.connect_to_pins(self.centralwidget.flwPins)
         self.thRecorder.displayer = self.centralwidget.figure
         
         self.refresh()
@@ -195,7 +190,9 @@ class Ui_Main(QtWidgets.QMainWindow):
             file_.close()
             d = eval(JSON)
             self.centralwidget.flwPins.load(d)
+            self.thRecorder.connect_to_pins(self.centralwidget.flwPins)
             self.open_file_name = filename
+            self.setWindowTitle("ArdOscil [{}]".format(self.open_file_name))
 
 
     def open_macro(self):
@@ -229,6 +226,7 @@ if __name__ == "__main__":
 
     MainWindow = Ui_Main()
     MainWindow.show()
+    MainWindow.open_conf()
     #MainWindow.showMaximized()
     
     app.exec_()

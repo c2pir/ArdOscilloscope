@@ -50,5 +50,3 @@ class UIConf(QtWidgets.QWidget):
         
         vl.addLayout(hl0)
         vl.addLayout(hl)
-        
-        

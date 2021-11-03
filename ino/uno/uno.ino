@@ -25,7 +25,7 @@ void init_pins_variables(){
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(19200);
+  Serial.begin(115200);
   Serial.setTimeout(100);
   init_pins_variables();
 }
@@ -35,7 +35,7 @@ void loop() {
 
   // read order from the computer
   if (Serial.available()) {
-    msg = Serial.readString(); // read the incoming data as string
+    msg = Serial.readStringUntil('\n'); // read the incoming data as string
 
     // SET PIN MODE
     //par:D:2:2
