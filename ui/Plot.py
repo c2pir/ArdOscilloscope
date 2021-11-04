@@ -73,7 +73,7 @@ class SFigure(QtWidgets.QWidget):
         self.canvas.mpl_connect('button_press_event',self.onPress)
         
         self.axeD = self.fig.add_subplot(211)
-        self.axeA = self.fig.add_subplot(212)
+        self.axeA = self.fig.add_subplot(212, sharex=self.axeD)
         self.fig.text(0.5, 0.04, "time (s)", ha='center')
         
         # Create the navigation toolbar, tied to the canvas

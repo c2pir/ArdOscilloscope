@@ -20,8 +20,10 @@ class PinTable(QtWidgets.QTableWidget):
         self.verticalHeader().setVisible(False)
 
         self.setMaximumWidth(300)
+        self.itemChanged.connect(self.update_pin_name)
 
     def load(self, json):
+        self.blockSignals(True)
         self.json = json
         self.setRowCount(len(json))
         i = 0
@@ -32,14 +34,19 @@ class PinTable(QtWidgets.QTableWidget):
             if conf["watch"]==2:
                 cb.cb.setChecked(True)
             self.setCellWidget(i,0,cb)
-
-            self.setItem(i,1, QtWidgets.QTableWidgetItem(conf["name"]))
+            
+            item = QtWidgets.QTableWidgetItem(conf["name"])
+            item.index = i
+            self.setItem(i,1, item)
+            
             
             cbb = CBBMode(conf["type"])
             cbb.currentIndexChanged.connect(lambda x, index=i: self.update_mode(x, index))
             cbb.setCurrentIndex(conf["mode"])
             self.setCellWidget(i, 2, cbb)
             i+=1
+        
+        self.blockSignals(False)
         self.resizeColumnsToContents()
 
     def update_watch(self, x, i):
@@ -55,7 +62,13 @@ class PinTable(QtWidgets.QTableWidget):
             self.sChangeMode.emit(self.json[i])
         except Exception as e:
             print(e)
-        
+    
+    def update_pin_name(self, x):
+        try:
+            self.json[x.index]["name"] = x.text()
+            self.resizeColumnsToContents()
+        except Exception as e:
+            print(e)
 
 class CBWatch(QtWidgets.QWidget):
     """ CheckBox Field """

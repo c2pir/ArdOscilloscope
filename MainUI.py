@@ -57,7 +57,7 @@ class Ui_Main(QtWidgets.QMainWindow):
         self.menuFile.addAction(self.actionRunMacro)
         
         self.menuHelp.addAction(self.actionUserManual)
-
+        
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
         
@@ -68,7 +68,6 @@ class Ui_Main(QtWidgets.QMainWindow):
         self.actionSave.setText("Save")
         self.actionSave_as.setText("Save as...")
         self.actionRunMacro.setText("Run macro")
-
         
         
         # BINDINGS
@@ -85,6 +84,7 @@ class Ui_Main(QtWidgets.QMainWindow):
         self.centralwidget.fpbsConnect.method = self.connectDisconnect
         self.centralwidget.fpbsMacro.method = self.startStop
         self.centralwidget.fpbSend.clicked.connect(self.send)
+        self.centralwidget.leCmd.returnPressed.connect(self.send)
         self.centralwidget.figure.mpl_toolbar.pbsPlayPause.method = self.playPause
         self.thSerial.sData.connect(self.thRecorder.receiveData)
         self.thRunner.sEnd.connect(self.centralwidget.fpbsMacro.clicked.emit)
@@ -95,6 +95,7 @@ class Ui_Main(QtWidgets.QMainWindow):
 
 
     def connectDisconnect(self, b):
+        """Connect/disconnect method for UI button."""
         ind = self.centralwidget.fcbPort.cb.currentIndex()
         
         if self.thSerial.ser is not None:
@@ -232,6 +233,7 @@ class Ui_Main(QtWidgets.QMainWindow):
 
 if __name__ == "__main__":
     import sys
+    print("START")
     app = QtWidgets.QApplication(sys.argv) 
     #QtWidgets.QApplication.setStyle(QtWidgets.QStyleFactory.create('Fusion'))
 
