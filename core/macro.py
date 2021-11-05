@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 """
+All functions usable in a macro
 """
 import time
 
 
-def refresh_port_list():
-    # TODO
-    return []
+def refresh_port_list(cls):
+    """Refresh alvailable port list"""
+    cls.refresh()
+    return cls.thSerial.ports
+
 
 def connect(cls, port_name):
     """Try to connect to a given port
@@ -28,6 +31,7 @@ def connect(cls, port_name):
     
     return False
 
+
 def is_connected(cls):
     """Check if communication is established
     return: True if serial port is connected"""
@@ -35,6 +39,7 @@ def is_connected(cls):
         return False
     else:
         return True
+
 
 def start_recording(cls, nb_points = 1000, show = False):
     """Start records
@@ -47,14 +52,16 @@ def start_recording(cls, nb_points = 1000, show = False):
     if show and cls.centralwidget.figure.mpl_toolbar.pbsPlayPause.state: 
         cls.centralwidget.figure.mpl_toolbar.pbsPlayPause.clicked.emit(False)
 
+
 def stop_recording(cls):
-    """ """
+    """Stop records"""
     cls.thRecorder.update_displayer = True
     
     if (not cls.centralwidget.figure.mpl_toolbar.pbsPlayPause.state): 
         cls.centralwidget.figure.mpl_toolbar.pbsPlayPause.clicked.emit(False)
     else:
         cls.thRecorder.show()
+
 
 def configure_pin(cls, name, mode=0, watch=True):
     """Configure a pin
@@ -73,6 +80,7 @@ def configure_pin(cls, name, mode=0, watch=True):
             time.sleep(0.2)
         row +=1
     pass
+
 
 def set_pin(cls, names, values):
     """Set a pin in write mode to the given value
@@ -95,8 +103,9 @@ def set_pin(cls, names, values):
             row+=1
     cls.thSerial.send(cmd)
 
+
 def get_pin(cls, names):
-    """ """
+    """Get pins actual values by names"""
     res = []
     for i in range(len(names)):
         row = 0
@@ -109,6 +118,7 @@ def get_pin(cls, names):
                     print("ERROR:MACRO:get_pin",e)
             row += 1
     return res
+
 
 def save_data_as_csv(cls, file_name, separator=";"):
     """Save recordeed data as csv (you need to call start_recording before)
@@ -141,3 +151,23 @@ def save_data_as_csv(cls, file_name, separator=";"):
     f = open(file_name, "w")
     f.write(csv)
     f.close()
+
+
+def attach(cls, pin_name, condition, method):
+    """Attach a pin condition to a method
+    pin_name: pin name of the pin value used as input of the condition
+    condition: function that return a boolean (ex: 'lambda x: return x==1')
+    method: callback when condition is true (method must take one argument)
+    """
+    row = 0
+    for conf in cls.centralwidget.flwPins.json:
+        if conf["name"]==pin_name:
+            break
+        row += 1
+    
+    d = {"index": row, "condition": condition, "method": method}
+    if d not in cls.callbacks: 
+        cls.callbacks.append(d)
+    pass
+    
+    

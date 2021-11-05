@@ -32,7 +32,7 @@ class CBField(QtWidgets.QWidget):
         
 
 class PBField(QtWidgets.QPushButton):
-    """ """
+    """Custom push button"""
     def __init__(self, path="", tool_tip="", parent=None):
         QtWidgets.QPushButton.__init__(self, parent)
 
@@ -43,24 +43,26 @@ class PBField(QtWidgets.QPushButton):
         self.setToolTip(tool_tip)
 
 class PBSField(QtWidgets.QPushButton):
-    """ """
+    """Double state push button"""
     def __init__(self, path=["",""], tool_tips = ["",""], parent=None):
         QtWidgets.QPushButton.__init__(self, parent)
-
+        
+        # VARIABLES
+        self.state = True
+        self.method = None
+        
         self.iconON = QtGui.QIcon()
         self.iconON.addPixmap(QtGui.QPixmap(path[0]), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        
         
         self.iconOFF = QtGui.QIcon()
         self.iconOFF.addPixmap(QtGui.QPixmap(path[1]), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         
-        self.state = True
-        self.method = None
         
         self.setIcon(self.iconON)
         self.setToolTip(tool_tips[0])
         self.tt = tool_tips
         
+        # BINDINGS
         self.clicked.connect(self.onClick)
     
     def onClick(self):

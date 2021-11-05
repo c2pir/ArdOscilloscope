@@ -30,6 +30,7 @@ class Recorder(QtCore.QThread):
 
 
     def flush(self):
+        """Clear datas list"""
         if self.mutexData.tryLock(10):
             for i in range(len(self.datas)):
                 self.datas[i] = []
@@ -43,8 +44,10 @@ class Recorder(QtCore.QThread):
         """ Callback to store data from arduino board """
         try:
             data = dico["list"]
+            # save last reception
             self.current_pins_values = [int(v) for v in data]
             
+            # save received data
             if self.mutexData.tryLock(10):
                 
                 if len(self.time)==self.nbPoints:

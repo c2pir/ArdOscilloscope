@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 """
+Thread to run a macro
 """
 from PyQt5 import QtCore, QtGui, QtWidgets
 import time
 
 class Runner(QtCore.QThread):
     sEnd = QtCore.pyqtSignal()
+    sError = QtCore.pyqtSignal(list)
     
     def __init__(self, parent=None):
         QtCore.QThread.__init__(self,parent)
@@ -21,7 +23,7 @@ class Runner(QtCore.QThread):
             print(self.name, my_macro)
             my_macro.run(self.ui)
         except Exception as e:
-            print(e)
+            self.sError.emit(["","Macro failed.",str(e)])
         
         # TODO unload module
         #setattr(module, self.name, None)

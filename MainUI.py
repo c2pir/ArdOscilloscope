@@ -9,6 +9,7 @@ from core.recorder import Recorder
 from core.runner import Runner
 import json
 import os
+import sys
 
 current_directory=os.getcwd()
 
@@ -17,13 +18,13 @@ class Ui_Main(QtWidgets.QMainWindow):
     """ Main window object """
     def __init__(self, parent=None):
         QtWidgets.QMainWindow.__init__(self, parent)
-        self.resize(1024, 680)
         
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("img/monitor.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon = QtGui.QIcon("img/monitor.ico")
+        #icon.addPixmap(QtGui.QPixmap("img/monitor.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.setWindowIcon(icon)
         
         self.setWindowTitle("ArdOscil")
+        self.resize(1024, 680)
         
         # VARIABLES
         self.open_file_name = "conf/Arduino nano.json"
@@ -31,6 +32,7 @@ class Ui_Main(QtWidgets.QMainWindow):
         self.thSerial = ThreadSerial()
         self.thRecorder = Recorder()
         self.thRunner = Runner(self)
+        self.callbacks = []
         
         ## GUI
         self.centralwidget = UIConf({})
@@ -68,16 +70,16 @@ class Ui_Main(QtWidgets.QMainWindow):
         self.actionSave.setText("Save")
         self.actionSave_as.setText("Save as...")
         self.actionRunMacro.setText("Run macro")
+        self.actionOpen.setShortcut("Ctrl+O")
+        self.actionSave.setShortcut("Ctrl+S")
+        self.actionRunMacro.setShortcut("Ctrl+R")
         
         
         # BINDINGS
         self.actionOpen.triggered.connect(self.open_conf)
         self.actionSave_as.triggered.connect(self.saveAs)
         self.actionSave.triggered.connect(self.save)
-        self.actionRunMacro.triggered.connect(self.centralwidget.fpbsMacro.clicked.emit) 
-        self.actionOpen.setShortcut("Ctrl+O")
-        self.actionSave.setShortcut("Ctrl+S")
-        self.actionRunMacro.setShortcut("Ctrl+R")
+        self.actionRunMacro.triggered.connect(self.centralwidget.fpbsMacro.clicked.emit)
         self.centralwidget.flwPins.sChangeMode.connect(self.changeMode)
         self.centralwidget.flwPins.sChangeWatch.connect(self.changeWatch)
         self.centralwidget.fpbRefresh.clicked.connect(self.refresh)
@@ -87,11 +89,25 @@ class Ui_Main(QtWidgets.QMainWindow):
         self.centralwidget.leCmd.returnPressed.connect(self.send)
         self.centralwidget.figure.mpl_toolbar.pbsPlayPause.method = self.playPause
         self.thSerial.sData.connect(self.thRecorder.receiveData)
+        self.thSerial.sData.connect(self.reception_trigger)
+        self.thSerial.sError.connect(self.show_popup)
         self.thRunner.sEnd.connect(self.centralwidget.fpbsMacro.clicked.emit)
+        self.thRunner.sError.connect(self.show_popup)
         
         self.thRecorder.displayer = self.centralwidget.figure
         
         self.refresh()
+
+
+    def show_popup(self, messages):
+        ## DIALOG BOX
+        uiPopup = QtWidgets.QMessageBox(self)
+        uiPopup.setIcon(QtWidgets.QMessageBox.Critical)
+        
+        uiPopup.setWindowTitle("Error")
+        uiPopup.setInformativeText(messages[2])
+        uiPopup.setText(messages[1])
+        uiPopup.exec_()
 
 
     def connectDisconnect(self, b):
@@ -207,6 +223,15 @@ class Ui_Main(QtWidgets.QMainWindow):
         return not b
 
 
+    def reception_trigger(self, dico):
+        data = dico["list"]
+        
+        # call trigger methods
+        for callback in self.callbacks:
+            ind = callback["index"]
+            if callback["condition"](data[ind]):
+                callback["method"](self)
+
     def open_macro(self):
         f = QtWidgets.QFileDialog()
         f.setMaximumSize(700,400)
@@ -232,9 +257,8 @@ class Ui_Main(QtWidgets.QMainWindow):
 
 
 if __name__ == "__main__":
-    import sys
     print("START")
-    app = QtWidgets.QApplication(sys.argv) 
+    app = QtWidgets.QApplication(sys.argv[1:]) 
     #QtWidgets.QApplication.setStyle(QtWidgets.QStyleFactory.create('Fusion'))
 
     MainWindow = Ui_Main()
@@ -244,4 +268,3 @@ if __name__ == "__main__":
     
     app.exec_()
     sys.exit()
-

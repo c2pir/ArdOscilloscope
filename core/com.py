@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Mar 18 14:12:57 2019
+Serial thread to read and write with arduino board
 @author: 46053149
 """
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -13,7 +14,8 @@ import serial.tools.list_ports
 class ThreadSerial(QtCore.QThread):
     """objet thread """
     sData = QtCore.pyqtSignal(dict)
- 
+    sError = QtCore.pyqtSignal(list)
+    
     def __init__(self, parent=None):
             QtCore.QThread.__init__(self,parent)
             self.ser = None
@@ -48,11 +50,14 @@ class ThreadSerial(QtCore.QThread):
                 self.ser.baudrate = 115200 #38400 #19200 #250000
                 print("INFO:Serial: connected to "+str(self.ports[i].device))
                 return True
+            error_msg = "ERROR:Serial: no ports found"
         except:
             if (len(self.ports)!=0):
-                print("ERROR:Serial: connection failed")
+                error_msg = "ERROR:Serial: connection failed"
             else:
-                print("ERROR:Serial: no ports found")
+                error_msg = "ERROR:Serial: no ports found"
+        print(error_msg)
+        self.sError.emit(["","Not able to connect.",error_msg])
         return False
 
 

@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+UI class for pins list
 """
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 class PinTable(QtWidgets.QTableWidget):
-    """ """
+    """Table of pins configurations"""
     sChangeMode = QtCore.pyqtSignal(dict)
     sChangeWatch = QtCore.pyqtSignal(dict)
     
@@ -23,6 +24,7 @@ class PinTable(QtWidgets.QTableWidget):
         self.itemChanged.connect(self.update_pin_name)
 
     def load(self, json):
+        """Load and show a json config file."""
         self.blockSignals(True)
         self.json = json
         self.setRowCount(len(json))
