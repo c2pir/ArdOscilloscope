@@ -28,6 +28,10 @@ class Runner(QtCore.QThread):
         # TODO unload module
         #setattr(module, self.name, None)
         
+        # set recording parameters as usual
+        self.ui.thRecorder.do_record = True
+        self.ui.thRecorder.nbPoints = 1000
+        self.ui.thRecorder.flush()
         
         print("END OF MACRO")
         self.sEnd.emit()

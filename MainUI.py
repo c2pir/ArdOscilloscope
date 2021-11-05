@@ -231,12 +231,6 @@ class Ui_Main(QtWidgets.QMainWindow):
         """Callback on serial reception"""
         data = dico["list"]
         
-        # save last reception
-        try:
-            self.current_pins_values = [int(v) for v in data]
-        except:
-            print("WARNING:MainUI: parsing received data failed")
-        
         # update UI list
         if time.time()-self.t0>self.refresh_period:
             self.t0 = time.time()
