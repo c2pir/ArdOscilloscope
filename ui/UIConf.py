@@ -37,15 +37,12 @@ class UIConf(QtWidgets.QWidget):
         hl0.addWidget(self.fpbsMacro)
         hl0.addItem(spacerItem)        
 
-        self.fcbPin = CBField("Pin", options=["D{}".format(i) for i in range(2,13)])
 
         hl = QtWidgets.QHBoxLayout()
         
         self.flwPins = PinTable(self)
-        self.figure = SFigure()
-        
-        
         self.flwPins.load(_json)
+        self.figure = SFigure()
 
         hl.addWidget(self.flwPins)
         hl.addWidget(self.figure)

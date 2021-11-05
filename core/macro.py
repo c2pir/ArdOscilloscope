@@ -41,26 +41,24 @@ def is_connected(cls):
         return True
 
 
-def start_recording(cls, nb_points = 1000, show = False):
+def start_recording(cls, nb_points = 1000):
     """Start records
     nb_points: number of points before looping data recording
-    show: if True UI will display data in 'real time'
     """
     cls.thRecorder.nbPoints = nb_points
-    cls.thRecorder.update_displayer = show
+    cls.thRecorder.do_record = True
     cls.thRecorder.flush()
-    if show and cls.centralwidget.figure.mpl_toolbar.pbsPlayPause.state: 
-        cls.centralwidget.figure.mpl_toolbar.pbsPlayPause.clicked.emit(False)
 
 
 def stop_recording(cls):
     """Stop records"""
+    cls.thRecorder.do_record = False
+
+
+def show_data(cls):
+    """ """
     cls.thRecorder.update_displayer = True
-    
-    if (not cls.centralwidget.figure.mpl_toolbar.pbsPlayPause.state): 
-        cls.centralwidget.figure.mpl_toolbar.pbsPlayPause.clicked.emit(False)
-    else:
-        cls.thRecorder.show()
+    cls.thRecorder.show()
 
 
 def configure_pin(cls, name, mode=0, watch=True):
@@ -153,7 +151,7 @@ def save_data_as_csv(cls, file_name, separator=";"):
     f.close()
 
 
-def attach(cls, pin_name, condition, method):
+def add_trigger(cls, pin_name, condition, method):
     """Attach a pin condition to a method
     pin_name: pin name of the pin value used as input of the condition
     condition: function that return a boolean (ex: 'lambda x: return x==1')
@@ -168,6 +166,7 @@ def attach(cls, pin_name, condition, method):
     d = {"index": row, "condition": condition, "method": method}
     if d not in cls.callbacks: 
         cls.callbacks.append(d)
-    pass
-    
-    
+
+
+def remove_triggers(cls):
+    cls.callbacks = []

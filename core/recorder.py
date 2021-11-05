@@ -15,6 +15,7 @@ class Recorder(QtCore.QThread):
         self.stop = False
         self.displayer = None
         self.update_displayer = True
+        self.do_record = True
         self.current_pins_values = []
         self.updateFrequency = 2.0 #Hz
         self.last_time = time.time()
@@ -44,31 +45,33 @@ class Recorder(QtCore.QThread):
         """ Callback to store data from arduino board """
         try:
             data = dico["list"]
+            
             # save last reception
             self.current_pins_values = [int(v) for v in data]
             
             # save received data
-            if self.mutexData.tryLock(10):
-                
-                if len(self.time)==self.nbPoints:
-                    self.time[self.current_index] = dico["timestamp"]
-                else:
-                    self.time.append(dico["timestamp"])
-                
-                
-                for i in range(len(data)):
-                    if i>=len(self.datas):
-                        break
+            if self.do_record:
+                if self.mutexData.tryLock(10):
                     
-                    if len(self.datas[i])==self.nbPoints:
-                        self.datas[i][self.current_index] = int(data[i])
+                    if len(self.time)==self.nbPoints:
+                        self.time[self.current_index] = dico["timestamp"]
                     else:
-                        self.datas[i].append(int(data[i]))
+                        self.time.append(dico["timestamp"])
+                    
+                    
+                    for i in range(len(data)):
+                        if i>=len(self.datas):
+                            break
                         
-                self.current_index = (self.current_index+1)%self.nbPoints
-                
-                self.mutexData.unlock()
-                return True
+                        if len(self.datas[i])==self.nbPoints:
+                            self.datas[i][self.current_index] = int(data[i])
+                        else:
+                            self.datas[i].append(int(data[i]))
+                            
+                    self.current_index = (self.current_index+1)%self.nbPoints
+                    
+                    self.mutexData.unlock()
+                    return True
         except Exception as e:
             print("ERROR:Recorder:receiveData",e)
         return False

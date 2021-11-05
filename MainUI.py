@@ -10,6 +10,7 @@ from core.runner import Runner
 import json
 import os
 import sys
+import time
 
 current_directory=os.getcwd()
 
@@ -33,6 +34,8 @@ class Ui_Main(QtWidgets.QMainWindow):
         self.thRecorder = Recorder()
         self.thRunner = Runner(self)
         self.callbacks = []
+        self.refresh_period = 1.5
+        self.t0 = time.time()
         
         ## GUI
         self.centralwidget = UIConf({})
@@ -74,7 +77,6 @@ class Ui_Main(QtWidgets.QMainWindow):
         self.actionSave.setShortcut("Ctrl+S")
         self.actionRunMacro.setShortcut("Ctrl+R")
         
-        
         # BINDINGS
         self.actionOpen.triggered.connect(self.open_conf)
         self.actionSave_as.triggered.connect(self.saveAs)
@@ -100,6 +102,7 @@ class Ui_Main(QtWidgets.QMainWindow):
 
 
     def show_popup(self, messages):
+        """ """
         ## DIALOG BOX
         uiPopup = QtWidgets.QMessageBox(self)
         uiPopup.setIcon(QtWidgets.QMessageBox.Critical)
@@ -127,6 +130,7 @@ class Ui_Main(QtWidgets.QMainWindow):
 
 
     def playPause(self, play):
+        """Play/Pause method for UI button."""
         if play:
             self.thRecorder.stop = False
             self.thRecorder.start()
@@ -224,13 +228,30 @@ class Ui_Main(QtWidgets.QMainWindow):
 
 
     def reception_trigger(self, dico):
+        """Callback on serial reception"""
         data = dico["list"]
+        
+        # save last reception
+        try:
+            self.current_pins_values = [int(v) for v in data]
+        except:
+            print("WARNING:MainUI: parsing received data failed")
+        
+        # update UI list
+        if time.time()-self.t0>self.refresh_period:
+            self.t0 = time.time()
+            self.centralwidget.flwPins.blockSignals(True)
+            for i in range(self.centralwidget.flwPins.rowCount()):
+                self.centralwidget.flwPins.item(i,3).setText(data[i])
+            self.centralwidget.flwPins.blockSignals(False)
         
         # call trigger methods
         for callback in self.callbacks:
             ind = callback["index"]
-            if callback["condition"](data[ind]):
+            x = int(data[ind])
+            if callback["condition"](x):
                 callback["method"](self)
+
 
     def open_macro(self):
         f = QtWidgets.QFileDialog()

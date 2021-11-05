@@ -17,21 +17,21 @@ class ThreadSerial(QtCore.QThread):
     sError = QtCore.pyqtSignal(list)
     
     def __init__(self, parent=None):
-            QtCore.QThread.__init__(self,parent)
-            self.ser = None
-            self.stop = False
-            self.msg = ""
+        QtCore.QThread.__init__(self,parent)
+        self.ser = None
+        self.stop = False
+        self.msg = ""
 
-            self.mutexCmd = QtCore.QMutex()
-            self.cmd = []
+        self.mutexCmd = QtCore.QMutex()
+        self.cmd = []
 
-            
-            self.t_TX = time.time()
-            self.t_RX = time.time()
-            self.samplingFrequency = 1000 # Hz
-            self.port_index = -1
+        
+        self.t_TX = time.time()
+        self.t_RX = time.time()
+        self.samplingFrequency = 1000 # Hz
+        self.port_index = -1
 
-            self.refresh()
+        self.refresh()
 
 
     def refresh(self):

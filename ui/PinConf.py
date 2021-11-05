@@ -14,8 +14,8 @@ class PinTable(QtWidgets.QTableWidget):
         QtWidgets.QTableWidget.__init__(self, parent)
         
         #Column count
-        self.setColumnCount(3)
-        self.setHorizontalHeaderLabels(["watch","pin", "mode"])
+        self.setColumnCount(4)
+        self.setHorizontalHeaderLabels(["watch", "pin", "mode", "value"])
 
         self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.verticalHeader().setVisible(False)
@@ -31,7 +31,6 @@ class PinTable(QtWidgets.QTableWidget):
         i = 0
         for conf in json:
             cb = CBWatch()
-            
             cb.cb.stateChanged.connect(lambda x, index=i: self.update_watch(x, index))
             if conf["watch"]==2:
                 cb.cb.setChecked(True)
@@ -46,6 +45,11 @@ class PinTable(QtWidgets.QTableWidget):
             cbb.currentIndexChanged.connect(lambda x, index=i: self.update_mode(x, index))
             cbb.setCurrentIndex(conf["mode"])
             self.setCellWidget(i, 2, cbb)
+            
+            itemv = QtWidgets.QTableWidgetItem("")
+            itemv.setFlags(QtCore.Qt.ItemIsEnabled)
+            self.setItem(i,3, itemv)
+            
             i+=1
         
         self.blockSignals(False)
