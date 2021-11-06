@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Mar 18 14:12:57 2019
-Serial thread to read and write with arduino board
+Serial module
 @author: 46053149
 """
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -12,25 +12,25 @@ import serial.tools.list_ports
 
 
 class ThreadSerial(QtCore.QThread):
-    """objet thread """
-    sData = QtCore.pyqtSignal(dict)
-    sError = QtCore.pyqtSignal(list)
+    """thread for serial communication with a board"""
+    sData = QtCore.pyqtSignal(dict)     # signal send on reception from the board
+    sError = QtCore.pyqtSignal(list)    # signal send on errors
     
     def __init__(self, parent=None):
         QtCore.QThread.__init__(self,parent)
-        self.ser = None
-        self.stop = False
-        self.msg = ""
-
+        self.ser = None         # serial object
+        self.stop = False       # boolean to leave the thread
+        self.msg = ""           # last received serial data
+        
         self.mutexCmd = QtCore.QMutex()
-        self.cmd = []
-
+        self.cmd = []           # queue of commands to send to the board
+        
         
         self.t_TX = time.time()
         self.t_RX = time.time()
-        self.samplingFrequency = 1000 # Hz
-        self.port_index = -1
-
+        self.port_index = -1    # index of the port to connect to on the port list
+        
+        # update ports list at start
         self.refresh()
 
 
@@ -87,11 +87,6 @@ class ThreadSerial(QtCore.QThread):
         except Exception as e:
             print("ERROR:Serial:send:",e)
             self.ConnexionError.emit(True)
-#            try:
-#                self.ser.flushInput()
-#                self.ser.write(str(msg))
-#            except:
-#                pass
 
 
     def sendAuto(self):
@@ -145,6 +140,7 @@ class ThreadSerial(QtCore.QThread):
 
 
     def run(self):
+        """Thread loop"""
         while not self.stop:
             self.read()
             self.sendAuto()

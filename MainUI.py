@@ -29,12 +29,11 @@ class Ui_Main(QtWidgets.QMainWindow):
         
         # VARIABLES
         self.open_file_name = "conf/Arduino nano.json"
-        self.result = None
-        self.thSerial = ThreadSerial()
-        self.thRecorder = Recorder()
-        self.thRunner = Runner(self)
-        self.callbacks = []
-        self.refresh_period = 1.5
+        self.thSerial = ThreadSerial()          # thread used for serial communication
+        self.thRecorder = Recorder()            # thread used for data recording
+        self.thRunner = Runner(self)            # thread used to run a custom macro
+        self.callbacks = []                     # list of callbacks (used for triggers see core/macro.py)
+        self.refresh_period = 1.5               # refresh period for pins values (s)
         self.t0 = time.time()
         
         ## GUI
@@ -102,7 +101,7 @@ class Ui_Main(QtWidgets.QMainWindow):
 
 
     def show_popup(self, messages):
-        """ """
+        """UI show error messages"""
         ## DIALOG BOX
         uiPopup = QtWidgets.QMessageBox(self)
         uiPopup.setIcon(QtWidgets.QMessageBox.Critical)
@@ -114,7 +113,7 @@ class Ui_Main(QtWidgets.QMainWindow):
 
 
     def connectDisconnect(self, b):
-        """Connect/disconnect method for UI button."""
+        """UI Connect/disconnect to the selected port"""
         ind = self.centralwidget.fcbPort.cb.currentIndex()
         
         if self.thSerial.ser is not None:
@@ -130,7 +129,7 @@ class Ui_Main(QtWidgets.QMainWindow):
 
 
     def playPause(self, play):
-        """Play/Pause method for UI button."""
+        """UI Play/Pause grapher"""
         if play:
             self.thRecorder.stop = False
             self.thRecorder.start()
@@ -141,16 +140,19 @@ class Ui_Main(QtWidgets.QMainWindow):
 
 
     def refresh(self):
+        """UI update displayed and alvailable ports list"""
         self.thSerial.refresh()
         self.centralwidget.fcbPort.load(self.thSerial.ports)
 
 
     def send(self):
+        """UI send serial command written in the line edit"""
         cmd = self.centralwidget.leCmd.text()
         self.thSerial.send(cmd)
 
 
     def changeMode(self, conf):
+        """Send pin mode to the board on pin mode selection change"""
         #print(conf)
         mode = conf["mode"]
         if mode==3 and ("PWM" in conf["type"]): # PWM case
@@ -162,10 +164,12 @@ class Ui_Main(QtWidgets.QMainWindow):
 
 
     def changeWatch(self, conf):
+        # FIXME: to remove
         print(conf)
 
 
     def save(self):
+        """Save loaded board configuration"""
         if self.open_file_name==-1:
             self.saveAs()
         else:
@@ -177,6 +181,7 @@ class Ui_Main(QtWidgets.QMainWindow):
 
 
     def saveAs(self):
+        """UI open file dialog to save pin configuration"""
         f = QtWidgets.QFileDialog()
         f.setMaximumSize(700,400)
         f.setWindowModality(QtCore.Qt.WindowModal)
@@ -197,6 +202,7 @@ class Ui_Main(QtWidgets.QMainWindow):
 
 
     def open_conf(self):
+        """UI open file dialog to load a board pin configuration"""
         f = QtWidgets.QFileDialog()
         f.setMaximumSize(700,400)
         f.setWindowModality(QtCore.Qt.WindowModal)
@@ -219,6 +225,7 @@ class Ui_Main(QtWidgets.QMainWindow):
 
 
     def startStop(self, b):
+        """UI Start/stop a macro"""
         if b:
             self.open_macro()
         else:
@@ -248,6 +255,7 @@ class Ui_Main(QtWidgets.QMainWindow):
 
 
     def open_macro(self):
+        """UI open file dialog to choose and run a custom macro."""
         f = QtWidgets.QFileDialog()
         f.setMaximumSize(700,400)
         f.setWindowModality(QtCore.Qt.WindowModal)
@@ -265,6 +273,8 @@ class Ui_Main(QtWidgets.QMainWindow):
 
 
     def closeEvent(self, event):
+        """Called when the main window is closed"""
+        # End all threads
         self.thSerial.stop = True
         self.thRecorder.stop = True
         self.thSerial.disconnect()

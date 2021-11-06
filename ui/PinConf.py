@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-UI class for pins list
+UI classes for pins list
 """
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 class PinTable(QtWidgets.QTableWidget):
     """Table of pins configurations"""
-    sChangeMode = QtCore.pyqtSignal(dict)
-    sChangeWatch = QtCore.pyqtSignal(dict)
+    sChangeMode = QtCore.pyqtSignal(dict)   # signal send when a mode combobox selection change
+    sChangeWatch = QtCore.pyqtSignal(dict)  # signal send when a watch checkbox change state
     
     def __init__(self, parent=None):
         QtWidgets.QTableWidget.__init__(self, parent)
@@ -56,6 +56,7 @@ class PinTable(QtWidgets.QTableWidget):
         self.resizeColumnsToContents()
 
     def update_watch(self, x, i):
+        """Callback for watch column edition"""
         try:
             self.json[i]["watch"] = x
             self.sChangeWatch.emit(self.json[i])
@@ -63,6 +64,7 @@ class PinTable(QtWidgets.QTableWidget):
             print(e)
 
     def update_mode(self, x, i):
+        """Callback for mode column edition"""
         try:
             self.json[i]["mode"] = x
             self.sChangeMode.emit(self.json[i])
@@ -70,6 +72,7 @@ class PinTable(QtWidgets.QTableWidget):
             print(e)
     
     def update_pin_name(self, x):
+        """Callback for name column edition"""
         try:
             self.json[x.index]["name"] = x.text()
             self.resizeColumnsToContents()

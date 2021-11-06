@@ -1,29 +1,30 @@
 # -*- coding: utf-8 -*-
 """
-Thread to store data from the Arduino
+Data recorder module
 """
 from PyQt5 import QtCore, QtGui, QtWidgets
 import time
 import numpy as np
 
 class Recorder(QtCore.QThread):
-
+    """Thread to store data from the board"""
     def __init__(self, parent=None):
         QtCore.QThread.__init__(self,parent)
         
-        self.nbPoints = 1000
-        self.stop = False
-        self.displayer = None
-        self.update_displayer = True
-        self.do_record = True
-        self.current_pins_values = []
-        self.updateFrequency = 2.0 #Hz
+        # VARIABLES
+        self.nbPoints = 1000                # number of points before recording start to loop
+        self.stop = False                   # boolean to leave the thread
+        self.displayer = None               # UI object used to display data
+        self.update_displayer = True        # boolean to enable periodic display update
+        self.do_record = True               # boolean to enable data recording
+        self.current_pins_values = []       # last received pins values
+        self.update_frequency = 2.0         # frequency of display update (Hz)
         self.last_time = time.time()
         self.mutexData = QtCore.QMutex()
 
 
     def connect_to_pins(self, pins):
-        """ Initialize datas from pins """
+        """Initialize datas from pins"""
         self.pins = pins
         self.datas = [[] for i in range(len(self.pins.json))]
         self.time = []
@@ -42,7 +43,7 @@ class Recorder(QtCore.QThread):
         return False
 
     def receiveData(self, dico):
-        """ Callback to store data from arduino board """
+        """Callback to store data from arduino board"""
         try:
             data = dico["list"]
             
@@ -96,14 +97,16 @@ class Recorder(QtCore.QThread):
 
 
     def show(self):
+        """Method to display selected data on the grapher"""
         if self.update_displayer:
             dataA, dataD = self.filter_data()
             self.displayer.draw(self.time, dataA, dataD)
 
 
     def run(self):
+        """Thread loop to refresh grapher"""
         while not self.stop:
-            if time.time()-self.last_time >= 1.0/self.updateFrequency:
+            if time.time()-self.last_time >= 1.0/self.update_frequency:
                 self.last_time = time.time()
                 if self.displayer is not None:
                     self.show()

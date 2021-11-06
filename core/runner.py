@@ -1,22 +1,25 @@
 # -*- coding: utf-8 -*-
 """
-Thread to run a macro
+Python code runner module
 """
 from PyQt5 import QtCore, QtGui, QtWidgets
 import time
 
 class Runner(QtCore.QThread):
-    sEnd = QtCore.pyqtSignal()
-    sError = QtCore.pyqtSignal(list)
+    """Thread to run a macro"""
+    sEnd = QtCore.pyqtSignal()          # signal send when macro is finished
+    sError = QtCore.pyqtSignal(list)    # signal send to display error
     
     def __init__(self, parent=None):
         QtCore.QThread.__init__(self,parent)
         
+        # VARIABLES
         self.ui = parent
         self.name = None
         
             
     def run(self):
+        """Import and run a custom macro"""
         try:
             module = __import__("macros", fromlist=[self.name])
             my_macro =  getattr(module, self.name)

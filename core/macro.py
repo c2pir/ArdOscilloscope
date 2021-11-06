@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 """
-All functions usable in a macro
+Functions usable in a macro
+
+    cls argument allow to have access to all UI functionalities
+    it is given in your custom macro with 'def run(cls):' (the function containing your macro)
 """
 import time
 
 
 def refresh_port_list(cls):
-    """Refresh alvailable port list"""
+    """Refresh alvailable port list
+    return: alvailable ports list"""
     cls.refresh()
     return cls.thSerial.ports
 
@@ -56,14 +60,14 @@ def stop_recording(cls):
 
 
 def show_data(cls):
-    """ """
+    """Display recorded data on UI"""
     cls.thRecorder.update_displayer = True
     cls.thRecorder.show()
 
 
 def configure_pin(cls, name, mode=0, watch=True):
     """Configure a pin
-    name: pin name (as shown in the UI
+    name: pin name (as shown in the UI)
     mode: index of the corresponding UI combo box
     watch: if true pin values will be saved
     """
@@ -82,8 +86,8 @@ def configure_pin(cls, name, mode=0, watch=True):
 
 def set_pin(cls, names, values):
     """Set a pin in write mode to the given value
-    names: list of pins names (as shown in the UI
-    values: list of pin values
+    names: list of pins names (as shown in the UI)
+    values: list of desired pin values
     """
     cmd = "set:"
     
@@ -103,7 +107,8 @@ def set_pin(cls, names, values):
 
 
 def get_pin(cls, names):
-    """Get pins actual values by names"""
+    """Get pins actual values by names
+    names: list of pins names (as shown in the UI)"""
     res = []
     for i in range(len(names)):
         row = 0
@@ -154,7 +159,7 @@ def save_data_as_csv(cls, file_name, separator=";"):
 def add_trigger(cls, pin_name, condition, method):
     """Attach a pin condition to a method
     pin_name: pin name of the pin value used as input of the condition
-    condition: function that return a boolean (ex: 'lambda x: return x==1')
+    condition: function that return a boolean (ex: 'lambda x: x==1')
     method: callback when condition is true (method must take one argument)
     """
     row = 0
@@ -169,4 +174,5 @@ def add_trigger(cls, pin_name, condition, method):
 
 
 def remove_triggers(cls):
+    """Remove all triggers added"""
     cls.callbacks = []

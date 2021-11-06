@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """
+Main window centralwidget content
 """
 from PyQt5 import QtCore, QtGui, QtWidgets
 
